@@ -26,7 +26,9 @@ dataset.
 ## Reproduce
 
 Prerequisites: [uv](https://docs.astral.sh/uv/), a Kaggle account that has joined the
-competition and accepted its rules, and `~/.kaggle/kaggle.json` API credentials.
+competition and accepted its rules, and a Kaggle API credential in one of:
+- `~/.kaggle/access_token` (current Kaggle API token — kaggle.com → profile → Settings → API), or
+- `~/.kaggle/kaggle.json` (legacy username/key pair, via "Create Legacy API Key").
 
 ```bash
 # 1. install dependencies
