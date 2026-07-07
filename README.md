@@ -71,8 +71,10 @@ assuming more data would be the fix.
 
 ![demo](reports/figures/demo.gif)
 
-Run it yourself: `uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx`
-(not yet deployed to a Hugging Face Space).
+**Live demo: https://huggingface.co/spaces/betty0/steel-defect-segmentation**
+(CPU-only Space; downloads the ONNX weights from the model repo on startup).
+
+Run it locally: `uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx`
 
 ## Reproduce
 
