@@ -98,6 +98,12 @@ methodology as the baseline table above; full report in
 
 ![baseline vs defect_1-weighted per-class mask mAP](reports/figures/defect1_weighted_comparison.png)
 
+This run's own training curve confirms the earlier finish — validation mask
+mAP is noisy in the same way as the baseline, but plateaus by epoch 40 instead
+of continuing to climb through epoch 79:
+
+![defect_1-weighted training curve](reports/defect1_weighted/figures/training_curve.png)
+
 Verdict: it didn't pay off net. defect_1's mask mAP50-95 improved slightly
 (+0.006), but its own mAP50 actually dropped (−0.014), and the cost landed
 disproportionately on defect_2 (−0.036) and defect_4 (−0.042) — dragging the
