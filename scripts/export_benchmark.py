@@ -7,7 +7,7 @@ session: a warmup phase discarded from timing, followed by a fixed number of
 timed single-image runs, reporting mean/p50/p95 latency in milliseconds.
 
 Example:
-    uv run python scripts/export_benchmark.py --weights weights/best.pt --imgsz 1024
+    uv run python scripts/export_benchmark.py --weights weights/steel_defect_yolo26s_seg_best.pt --imgsz 1024
 """
 
 from __future__ import annotations

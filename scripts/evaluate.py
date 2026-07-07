@@ -7,7 +7,7 @@ predicted masks/labels) per class for visual inspection.
 
 Example:
     uv run python scripts/evaluate.py \\
-        --weights weights/best.pt --data ~/datasets/severstal/yolo/data.yaml
+        --weights weights/steel_defect_yolo26s_seg_best.pt --data ~/datasets/severstal/yolo/data.yaml
 """
 
 from __future__ import annotations

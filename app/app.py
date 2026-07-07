@@ -7,7 +7,7 @@ runs CPU-only (e.g. a Hugging Face Space); pass a .pt path to use PyTorch
 instead.
 
 Example:
-    uv run python app/app.py --weights weights/best.onnx
+    uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx
 """
 
 from __future__ import annotations
@@ -44,7 +44,12 @@ def build_demo(weights: Path, imgsz: int) -> gr.Interface:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--weights", type=Path, default=Path("weights/best.onnx"), help="path to .pt or .onnx weights")
+    parser.add_argument(
+        "--weights",
+        type=Path,
+        default=Path("weights/steel_defect_yolo26s_seg_best.onnx"),
+        help="path to .pt or .onnx weights",
+    )
     parser.add_argument("--imgsz", type=int, default=1024)
     parser.add_argument("--share", action="store_true", help="create a public Gradio share link")
     parser.add_argument("--server-port", type=int, default=None)
