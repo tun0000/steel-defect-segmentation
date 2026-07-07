@@ -96,6 +96,8 @@ methodology as the baseline table above; full report in
 | defect_4 | 0.316 | 0.274 | −0.042 | 0.642 | 0.617 | −0.026 |
 | **overall** | **0.232** | **0.216** | **−0.017** | **0.587** | **0.560** | **−0.027** |
 
+![baseline vs defect_1-weighted per-class mask mAP](reports/figures/defect1_weighted_comparison.png)
+
 Verdict: it didn't pay off net. defect_1's mask mAP50-95 improved slightly
 (+0.006), but its own mAP50 actually dropped (−0.014), and the cost landed
 disproportionately on defect_2 (−0.036) and defect_4 (−0.042) — dragging the
