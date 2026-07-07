@@ -13,6 +13,10 @@ dependencies = [
     "python-dotenv>=1.0",
     "kaggle>=2.2",
     "pyyaml>=6.0",
+    "onnx>=1.16",
+    "onnxslim>=0.1.82",
+    "onnxruntime-gpu>=1.19",
+    "gradio>=5.0",
 ]
 
 [dependency-groups]
