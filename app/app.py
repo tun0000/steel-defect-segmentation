@@ -25,7 +25,10 @@ DESCRIPTION = (
 
 
 def build_demo(weights: Path, imgsz: int) -> gr.Interface:
-    model = YOLO(str(weights))
+    # task="segment" is required: loading a bare .onnx (as opposed to the
+    # original .pt) can't always auto-detect the task and silently falls back
+    # to "detect", which drops mask output entirely.
+    model = YOLO(str(weights), task="segment")
 
     def predict(image):
         if image is None:
