@@ -5,23 +5,67 @@ Instance segmentation of steel surface defects (4 defect classes) using
 trained on the [Severstal: Steel Defect Detection](https://www.kaggle.com/competitions/severstal-steel-defect-detection)
 dataset.
 
-> **Status: work in progress** — Phase 1 (data pipeline + training notebook) done, training and evaluation pending.
+Trained on Google Colab (A100), evaluated and benchmarked locally on an RTX 4090.
+
+> **Status**: training, evaluation, and benchmarking are done with real
+> results below. Still pending: a recorded demo GIF and publishing the
+> weights + model card to Hugging Face Hub.
 
 ## Why this matters for steel / manufacturing quality inspection
 
-<!-- TODO(Phase 2): value proposition for automated surface inspection -->
+Manual visual inspection of steel strip surfaces is slow, inconsistent between
+inspectors, and hard to scale to full production-line speed. Instance
+segmentation — as opposed to plain classification or bounding-box detection —
+recovers the actual defect *shape and area*, which is what quality control
+actually needs to decide severity (a small edge nick vs. a large-area scale
+patch) and to feed downstream metrics like defect area per coil. An end-to-end,
+NMS-free model like YOLO26-seg also keeps per-image latency low enough
+(single-digit milliseconds on a GPU, see below) for inline inspection rather
+than offline sampling.
 
 ## Results
 
-<!-- TODO(Phase 2): mask mAP50 / mAP50-95 table (overall + per class), measured latency (RTX 4090 / CPU, ONNX) -->
+Real numbers from [`scripts/evaluate.py`](scripts/evaluate.py) and
+[`scripts/export_benchmark.py`](scripts/export_benchmark.py) against the held-out
+validation split (734 images, seed 42), full reports in
+[`reports/eval_results.md`](reports/eval_results.md) and
+[`reports/benchmark.md`](reports/benchmark.md).
 
-| Model | imgsz | mask mAP50 | mask mAP50-95 | GPU latency | CPU latency |
-|-------|-------|-----------|---------------|-------------|-------------|
-| yolo26s-seg | 1024 | TBD | TBD | TBD | TBD |
+| Model | imgsz | mask mAP50 | mask mAP50-95 | GPU latency (RTX 4090, ONNX) | CPU latency (ONNX) |
+|-------|-------|-----------:|--------------:|------------------------------:|--------------------:|
+| yolo26s-seg | 1024 | 0.587 | 0.232 | 8.04 ms mean (p95 8.46 ms) | 167.39 ms mean (p95 179.35 ms) |
+
+Per-class breakdown (mask metrics; `images`/`instances` are validation-split counts):
+
+| class | images | instances | mask mAP50 | mask mAP50-95 |
+|-------|-------:|----------:|-----------:|--------------:|
+| defect_1 | 90 | 293 | 0.537 | 0.173 |
+| defect_2 | 25 | 30 | 0.543 | 0.181 |
+| defect_3 | 514 | 1479 | 0.625 | 0.260 |
+| defect_4 | 80 | 210 | 0.642 | 0.316 |
+
+Sample prediction overlays per class are in [`reports/figures/`](reports/figures/).
+
+### Class imbalance: an honest look
+
+The training set is heavily imbalanced — defect_3 appears in 4,636 training
+images vs. only 222 for defect_2 (see [`reports/dataset_stats.md`](reports/dataset_stats.md))
+— but instance count alone does not predict per-class difficulty. defect_2, the
+*rarest* class, actually scores higher on mask mAP50-95 (0.181) than defect_1
+(0.173), which has roughly 10x more training instances. defect_1's defects tend
+to be thin, elongated scratches with ambiguous boundaries, which likely hurts
+mask IoU at stricter thresholds regardless of how much data it has — while
+defect_2's shape appears more consistent and learnable, and `copy_paste`
+augmentation (enabled during training specifically to help rare classes) may
+have offset some of its rarity. A v1.1 iteration could try per-class loss
+weighting or targeted oversampling for defect_1 specifically, rather than
+assuming more data would be the fix.
 
 ## Demo
 
-<!-- TODO(Phase 2): demo GIF + Hugging Face Space link -->
+<!-- TODO: record a demo GIF of app/app.py locally (upload an image, show the
+mask overlay) — needs a manual run since browser automation here can't drive
+a real file-picker upload. Hugging Face Space link once deployed. -->
 
 ## Reproduce
 
@@ -43,6 +87,17 @@ uv run python scripts/convert_severstal_to_yolo.py \
     --raw-dir ~/datasets/severstal/raw --out-dir ~/datasets/severstal/yolo
 
 # 4. train — open notebooks/steel_defect_yolo26_train.ipynb in Google Colab (Runtime -> Run all)
+# download the resulting best.pt into weights/ when done
+
+# 5. evaluate (writes reports/eval_results.md + per-class overlays in reports/figures/)
+uv run python scripts/evaluate.py \
+    --weights weights/steel_defect_yolo26s_seg_best.pt --data ~/datasets/severstal/yolo/data.yaml
+
+# 6. export to ONNX and benchmark GPU/CPU latency (writes reports/benchmark.md)
+uv run python scripts/export_benchmark.py --weights weights/steel_defect_yolo26s_seg_best.pt
+
+# 7. run the Gradio demo locally
+uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx
 ```
 
 ## Dataset
