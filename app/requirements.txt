@@ -1,3 +1,4 @@
 ultralytics>=8.4.0
 gradio>=5.0
 onnxruntime>=1.19
+huggingface_hub>=0.26

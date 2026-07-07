@@ -4,7 +4,8 @@
 Upload a steel surface image and see predicted defect masks overlaid with
 class labels and confidence scores. Defaults to an ONNX checkpoint so it
 runs CPU-only (e.g. a Hugging Face Space); pass a .pt path to use PyTorch
-instead.
+instead. If --weights doesn't exist locally (e.g. a fresh Space container),
+it's downloaded from the Hugging Face model repo instead.
 
 Example:
     uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx
@@ -22,6 +23,17 @@ DESCRIPTION = (
     "Upload a steel surface image to detect and segment surface defects "
     "(YOLO26-seg trained on the Severstal Steel Defect Detection dataset)."
 )
+HF_MODEL_REPO = "betty0/steel-defect-segmentation"
+HF_MODEL_FILE = "steel_defect_yolo26s_seg_best.onnx"
+
+
+def resolve_weights(weights: Path) -> Path:
+    """Return weights as-is if present locally, else download from the HF model repo."""
+    if weights.exists():
+        return weights
+    from huggingface_hub import hf_hub_download
+
+    return Path(hf_hub_download(HF_MODEL_REPO, HF_MODEL_FILE))
 
 
 def build_demo(weights: Path, imgsz: int) -> gr.Blocks:
@@ -65,7 +77,7 @@ def main() -> None:
     parser.add_argument("--server-port", type=int, default=None)
     args = parser.parse_args()
 
-    demo = build_demo(args.weights, args.imgsz)
+    demo = build_demo(resolve_weights(args.weights), args.imgsz)
     demo.launch(share=args.share, server_port=args.server_port)
 
 
