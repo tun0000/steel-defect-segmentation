@@ -46,6 +46,15 @@ Per-class breakdown (mask metrics; `images`/`instances` are validation-split cou
 
 Sample prediction overlays per class are in [`reports/figures/`](reports/figures/).
 
+Training ran 99 epochs (early stopped, `patience=20`) before selecting epoch
+79 as `best.pt` — Ultralytics picks the best checkpoint by combined box+mask
+mAP50-95, not mask mAP50-95 alone, which does land on a different epoch (92)
+if you (like I initially did) only look at the mask curve. Validation mask
+mAP is noisy epoch-to-epoch on a 734-image validation split with 4 imbalanced
+classes, but trends up and stabilizes in the second half of training:
+
+![training curve](reports/figures/training_curve.png)
+
 ### Class imbalance: an honest look
 
 The training set is heavily imbalanced — defect_3 appears in 4,636 training
