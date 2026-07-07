@@ -42,7 +42,7 @@ unzip -q ~/datasets/severstal/raw/severstal-steel-defect-detection.zip -d ~/data
 uv run python scripts/convert_severstal_to_yolo.py \
     --raw-dir ~/datasets/severstal/raw --out-dir ~/datasets/severstal/yolo
 
-# 4. train — open notebooks/train_colab.ipynb in Google Colab (Runtime -> Run all)
+# 4. train — open notebooks/steel_defect_yolo26_train.ipynb in Google Colab (Runtime -> Run all)
 ```
 
 ## Dataset

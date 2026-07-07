@@ -27,7 +27,7 @@ steel-defect-segmentation/
 │   ├── convert_severstal_to_yolo.py   # Phase 1 核心
 │   ├── evaluate.py                    # Phase 2
 │   └── export_benchmark.py            # Phase 2
-├── notebooks/train_colab.ipynb
+├── notebooks/steel_defect_yolo26_train.ipynb
 ├── app/                     # Phase 2 Gradio demo（可部署 HF Space）
 ├── reports/                 # 統計表、sanity 疊圖、結果圖（小檔可進 git）
 └── weights/                 # gitignored；Phase 2 放 best.pt / best.onnx
@@ -55,7 +55,7 @@ steel-defect-segmentation/
 - 小子集（~200 train / 50 val）+ `yolo26n-seg` + 1 epoch + imgsz=1024：確認 loss 正常、val 能跑、無 NaN。
 - 用產出權重對 2–3 張 val 圖 predict 疊圖，人工確認 mask 位置合理。
 
-### Step 4：`notebooks/train_colab.ipynb`（Runtime → Run all 一鍵跑完）
+### Step 4：`notebooks/steel_defect_yolo26_train.ipynb`（Runtime → Run all 一鍵跑完）
 - Cells：GPU check → mount Drive → Kaggle 憑證（優先 Colab Secrets 的 KAGGLE_USERNAME/KAGGLE_KEY，fallback 讀 Drive 上的 kaggle.json）→ `git clone` 本 repo → pip install → kaggle 下載 → **跑 repo 同一支轉換腳本** → 訓練 → 驗證 → 產物存 Drive。
 - 訓練設定：`yolo26s-seg.pt`、imgsz=1024、epochs=100 + patience=20、seed 固定；augmentation 針對鋼帶特性：`degrees=0`（方向固定）、`fliplr=0.5`、`flipud=0.5`（鋼帶上下翻轉合理）、`copy_paste=0.3`（seg 專用、幫助稀有類）、mosaic 預設、hsv 小值。
 - `project=` 指到 Drive 路徑 → checkpoint 自動落在 Drive，附 `resume=True` 說明 cell 供斷線續訓；結束後 best.pt / results.csv 複製到 Drive 固定路徑。
