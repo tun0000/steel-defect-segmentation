@@ -8,9 +8,6 @@ dataset.
 Trained on Google Colab (A100), evaluated and benchmarked locally on an RTX 4090.
 Weights + model card: **https://huggingface.co/betty0/steel-defect-segmentation**
 
-> **Status**: training, evaluation, benchmarking, and the Hugging Face upload
-> are done with real results below. Still pending: a recorded demo GIF.
-
 ## Why this matters for steel / manufacturing quality inspection
 
 Manual visual inspection of steel strip surfaces is slow, inconsistent between
@@ -72,9 +69,10 @@ assuming more data would be the fix.
 
 ## Demo
 
-<!-- TODO: record a demo GIF of app/app.py locally (upload an image, show the
-mask overlay) — needs a manual run since browser automation here can't drive
-a real file-picker upload. Hugging Face Space link once deployed. -->
+![demo](reports/figures/demo.gif)
+
+Run it yourself: `uv run python app/app.py --weights weights/steel_defect_yolo26s_seg_best.onnx`
+(not yet deployed to a Hugging Face Space).
 
 ## Reproduce
 
