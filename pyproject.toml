@@ -17,6 +17,7 @@ dependencies = [
     "onnxslim>=0.1.82",
     "onnxruntime-gpu>=1.19",
     "gradio>=5.0",
+    "huggingface-hub>=0.26",
 ]
 
 [dependency-groups]

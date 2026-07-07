@@ -6,10 +6,10 @@ trained on the [Severstal: Steel Defect Detection](https://www.kaggle.com/compet
 dataset.
 
 Trained on Google Colab (A100), evaluated and benchmarked locally on an RTX 4090.
+Weights + model card: **https://huggingface.co/betty0/steel-defect-segmentation**
 
-> **Status**: training, evaluation, and benchmarking are done with real
-> results below. Still pending: a recorded demo GIF and publishing the
-> weights + model card to Hugging Face Hub.
+> **Status**: training, evaluation, benchmarking, and the Hugging Face upload
+> are done with real results below. Still pending: a recorded demo GIF.
 
 ## Why this matters for steel / manufacturing quality inspection
 
