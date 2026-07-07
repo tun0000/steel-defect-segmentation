@@ -63,9 +63,51 @@ to be thin, elongated scratches with ambiguous boundaries, which likely hurts
 mask IoU at stricter thresholds regardless of how much data it has — while
 defect_2's shape appears more consistent and learnable, and `copy_paste`
 augmentation (enabled during training specifically to help rare classes) may
-have offset some of its rarity. A v1.1 iteration could try per-class loss
-weighting or targeted oversampling for defect_1 specifically, rather than
-assuming more data would be the fix.
+have offset some of its rarity. See the v1.1 experiment below for an attempt
+at per-class loss weighting to address this.
+
+### v1.1 experiment: per-class loss weighting for defect_1
+
+Hypothesis: since defect_1 underperforms despite having roughly 10x more
+training instances than defect_2, forcing the model to weight defect_1's
+classification loss more heavily during training might close the gap without
+touching the data pipeline.
+
+Implementation: a custom `on_pretrain_routine_end` callback (see
+[`notebooks/steel_defect_yolo26_train.ipynb`](notebooks/steel_defect_yolo26_train.ipynb))
+sets `model.class_weights = [2.0, 1.0, 1.0, 1.0]` — double weight on defect_1,
+unchanged for the rest. This is a different mechanism from Ultralytics' built-in
+`cls_pw` hyperparameter, which reweights by *inverse frequency* and would have
+pushed weight *away* from defect_1 (the more frequent of the two weak classes)
+— the wrong direction for this specific goal. Everything else — architecture,
+dataset, `imgsz=1024`, `epochs=100`/`patience=20`, seed, batch size,
+augmentation — is identical to the baseline run, so any difference is
+attributable to this one change.
+
+Real results (held-out validation split, same [`scripts/evaluate.py`](scripts/evaluate.py)
+methodology as the baseline table above; full report in
+[`reports/defect1_weighted/eval_results.md`](reports/defect1_weighted/eval_results.md)):
+
+| class | baseline mask mAP50-95 | weighted mask mAP50-95 | Δ | baseline mask mAP50 | weighted mask mAP50 | Δ |
+|-------|------------------------:|------------------------:|---:|----------------------:|-----------------------:|---:|
+| defect_1 | 0.173 | 0.179 | +0.006 | 0.537 | 0.523 | −0.014 |
+| defect_2 | 0.181 | 0.145 | −0.036 | 0.543 | 0.491 | −0.052 |
+| defect_3 | 0.260 | 0.265 | +0.005 | 0.625 | 0.609 | −0.016 |
+| defect_4 | 0.316 | 0.274 | −0.042 | 0.642 | 0.617 | −0.026 |
+| **overall** | **0.232** | **0.216** | **−0.017** | **0.587** | **0.560** | **−0.027** |
+
+Verdict: it didn't pay off net. defect_1's mask mAP50-95 improved slightly
+(+0.006), but its own mAP50 actually dropped (−0.014), and the cost landed
+disproportionately on defect_2 (−0.036) and defect_4 (−0.042) — dragging the
+combined fitness metric down enough that this run's best checkpoint landed at
+epoch 40 instead of baseline's epoch 79. A flat per-class weight is too blunt
+an instrument here: it doesn't distinguish *why* defect_1 underperforms (thin,
+ambiguous-boundary scratches, per above) from simply needing a bigger number,
+so it borrows capacity from other classes without addressing the actual cause.
+**The baseline (`steel_defect_yolo26s_seg_best.pt`) remains the model backing
+the demo and Hugging Face release.** A more targeted follow-up — e.g.
+weighting only the mask loss term, or oversampling defect_1 images instead of
+reweighting loss — would be the next thing worth trying.
 
 ## Demo
 
